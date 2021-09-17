@@ -1,13 +1,9 @@
-
 import librosa
 import soundfile  # to read audio
 import numpy as np
 import glob
 import os
 import pickle  # to save model after training
-import simpleaudio as sa
-
-
 from sklearn.model_selection import train_test_split  # for splitting training and testing
 from sklearn.neural_network import MLPClassifier  # multi-layer perceptron model
 from sklearn.metrics import accuracy_score   # to measure how good we are
@@ -74,25 +70,22 @@ AVAILABLE_EMOTIONS = {
     "happy"}
 
 def load_data(test_size=0.2):
-        X, y = [], []
-        filename = 'C://dataset//testdata//.wav'
-        wave_obj = sa.Waveobject.from_wave_file(filename)
-        play_obj = wave_obj.play()
-        play_obj.wait_done()
+    X, y = [], []
+    for file in glob.glob("C:\\dataset\\testdata\\Actor_*\\*.wav"):
         # get the base name of the audio file
         basename = os.path.basename(file)
         # get the emotion label
         emotion = int2emotion[basename.split("-")[2]]
         # we allow only AVAILABLE_EMOTIONS we set
         if emotion not in AVAILABLE_EMOTIONS:
-          continue
+            continue
         # extract speech features
         features = extract_feature(file, mfcc=True, chroma=True, mel=True)
         # add to data
         X.append(features)
         y.append(emotion)
     # split the data to training and testing and return it
-        return train_test_split(np.array(X), y, test_size=test_size, random_state=7)
+    return train_test_split(np.array(X), y, test_size=test_size, random_state=7)
 # load RAVDESS dataset, 75% training 25% testing
 X_train, X_test, y_train, y_test = load_data(test_size=0.25)
 
@@ -130,3 +123,6 @@ from sklearn.metrics import confusion_matrix
 matrix = confusion_matrix(y_test, y_pred)
 print (matrix)
 pickle.dump(model, open("train_model", "wb"))
+
+
+
